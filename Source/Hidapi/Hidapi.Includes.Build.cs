@@ -20,7 +20,7 @@ public partial class Hidapi : ModuleRules
 			Library options help:
 				
 		*/
-		PublicSystemIncludePaths.Add($"{ModuleDirectory}/LibraryFiles/hidapi/SysIncludes/include");
+		PublicSystemIncludePaths.Add($"{ModuleDirectory}/include");
 		
 		PlatformSetup = false;
 		IncludesSetup = true;

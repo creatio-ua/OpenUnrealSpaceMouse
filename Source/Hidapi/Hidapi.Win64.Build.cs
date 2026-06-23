@@ -20,7 +20,7 @@ public partial class Hidapi : ModuleRules
 			Library options help:
 				
 		*/
-		PublicAdditionalLibraries.Add($"{ModuleDirectory}/LibraryFiles/hidapi/Libs/Win64/{LibraryConfig}/hidapi.lib");
+		PublicAdditionalLibraries.Add($"{ModuleDirectory}/lib/Win64/{LibraryConfig}/hidapi.lib");
 		
 		PlatformSetup = true;
 	}

@@ -22,6 +22,7 @@
 #include "SpaceMouseEditor/SpaceMouseConfig.h"
 #include "SpaceMouseRuntime/RuntimeManager.h"
 #include "SpaceMouseRuntime/SmInputDevice.h"
+#include "Misc/EngineVersionComparison.h"
 
 namespace SpaceMouse::Editor::Interactor
 {
@@ -80,7 +81,7 @@ namespace SpaceMouse::Editor::Interactor
 			{
 				if (ActiveViewportClient.Get())
 				{
-					ActiveViewportClient->SetRealtime(bVpWasRealtime);
+					ActiveViewportClient.Get()->SetRealtime(bVpWasRealtime);
 					// ActiveViewportClient->ToggleOrbitCamera(bVpWasOrbitCamera);
 				}
 				// bVpWasOrbitCamera = cvp->ShouldOrbitCamera();
@@ -90,14 +91,14 @@ namespace SpaceMouse::Editor::Interactor
 		}
 
 		IsFocused = ActiveViewportClient.Get()
-			&& ActiveViewportClient->GetEditorViewportWidget()->HasAnyUserFocusOrFocusedDescendants();
+			&& ActiveViewportClient.Get()->GetEditorViewportWidget()->HasAnyUserFocusOrFocusedDescendants();
 
 		if (IsFocused.OnDown())
 		{
 			IsActive = true;
 		}
 
-		if (!ActiveViewportClient.Get() || !ActiveViewportClient->IsVisible())
+		if (!ActiveViewportClient.Get() || !ActiveViewportClient.Get()->IsVisible())
 		{
 			IsActive = false;
 			return;
@@ -120,16 +121,16 @@ namespace SpaceMouse::Editor::Interactor
 					ResetSpeed();
 
 				if (manager.GetButton(FSmInputDevice::GetButtonFrom(settings->ResetRollButton)).OnDown())
-					ActiveViewportClient->RemoveCameraRoll();
+					ActiveViewportClient.Get()->RemoveCameraRoll();
 			}
 
 			auto& movementState = manager.MovementState;
 
 			if (movementState.bOnMovementStartedFrame)
 			{
-				bVpWasRealtime = ActiveViewportClient->IsRealtime();
-				ActiveViewportClient->ToggleOrbitCamera(false);
-				ActiveViewportClient->SetRealtime(true);
+				bVpWasRealtime = ActiveViewportClient.Get()->IsRealtime();
+				ActiveViewportClient.Get()->ToggleOrbitCamera(false);
+				ActiveViewportClient.Get()->SetRealtime(true);
 
 				// Set scroll wheel speed change
 				FSlateApplication::Get().RegisterInputPreProcessor(MouseWheelSpeedChange);
@@ -138,7 +139,7 @@ namespace SpaceMouse::Editor::Interactor
 			if (movementState.bOnMovementEndedFrame)
 			{
 				// ActiveViewportClient->ToggleOrbitCamera(bVpWasOrbitCamera);
-				ActiveViewportClient->SetRealtime(bVpWasRealtime);
+				ActiveViewportClient.Get()->SetRealtime(bVpWasRealtime);
 
 				// Unset scroll wheel speed change
 				FSlateApplication::Get().UnregisterInputPreProcessor(MouseWheelSpeedChange);
@@ -148,7 +149,7 @@ namespace SpaceMouse::Editor::Interactor
 
 		IWidgetInteractionContext::Tick();
 
-		if (ActiveViewportClient.Get() && ActiveViewportClient->IsLevelEditorClient())
+		if (ActiveViewportClient.Get() && ActiveViewportClient.Get()->IsLevelEditorClient())
 		{
 			auto levelVpc = static_cast<FLevelEditorViewportClient*>(ActiveViewportClient.Get());
 			if (levelVpc->IsLockedToCinematic() || levelVpc->IsAnyActorLocked())
@@ -156,15 +157,15 @@ namespace SpaceMouse::Editor::Interactor
 				levelVpc->MoveViewportCamera(FVector::ZeroVector, FRotator::ZeroRotator);
 			}
 		}
-		ActiveViewportClient->Viewport->InvalidateHitProxy();
+		ActiveViewportClient.Get()->Viewport->InvalidateHitProxy();
 	}
 
 	void FViewportInteraction::ResetSpeed()
 	{
-#if UNREAL_VERSION(>=, 5, 7)
-		ActiveViewportClient->SetCameraSpeedSettings({1.0});
+#if UE_VERSION_NEWER_THAN(5, 7, 0)
+		ActiveViewportClient.Get()->SetCameraSpeedSettings({1.0});
 #else
-		ActiveViewportClient->SetCameraSpeedSetting(4);
+		ActiveViewportClient.Get()->SetCameraSpeedSetting(4);
 #endif
 	}
 
@@ -172,17 +173,17 @@ namespace SpaceMouse::Editor::Interactor
 	{
 		if (!ActiveViewportClient.Get()) return;
 
-#if UNREAL_VERSION(>=, 5, 7)
-		FEditorViewportCameraSpeedSettings speedSettings = ActiveViewportClient->GetCameraSpeedSettings();
+#if UE_VERSION_NEWER_THAN(5, 7, 0)
+		FEditorViewportCameraSpeedSettings speedSettings = ActiveViewportClient.Get()->GetCameraSpeedSettings();
 		const float speed = speedSettings.GetCurrentSpeed();
 		speedSettings.SetCurrentSpeed(deltaCoeff < 0
 			? speed * (1.f - deltaCoeff * -1.f)
 			: speed / (1.f - deltaCoeff)
 		);
-		ActiveViewportClient->SetCameraSpeedSettings(speedSettings);
+		ActiveViewportClient.Get()->SetCameraSpeedSettings(speedSettings);
 #else
-		int speed = FMath::Clamp(ActiveViewportClient->GetCameraSpeedSetting() + FMath::Sign(deltaCoeff), 1, 8);
-		ActiveViewportClient->SetCameraSpeedSetting(speed);
+		int speed = FMath::Clamp(ActiveViewportClient.Get()->GetCameraSpeedSetting() + FMath::Sign(deltaCoeff), 1, 8);
+		ActiveViewportClient.Get()->SetCameraSpeedSetting(speed);
 #endif
 	}
 }

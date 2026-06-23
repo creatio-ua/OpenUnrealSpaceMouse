@@ -15,6 +15,7 @@
 #include "SpaceMouseEditor/SmEditorManager.h"
 #include "SpaceMouseEditor/SpaceMouseConfig.h"
 #include "EditorViewportClient.h"
+#include "Misc/EngineVersionComparison.h"
 
 namespace SpaceMouse::Editor::Interactor
 {
@@ -52,7 +53,7 @@ namespace SpaceMouse::Editor::Interactor
 		case LVT_OrthoXY:
 			{
 				currRot = FRotationMatrix::MakeFromX({0, 0, -1}).Rotator();
-#if UNREAL_VERSION(<, 5, 6)
+#if UE_VERSION_OLDER_THAN(5, 6, 0)
 				currRot = FRotator(currRot.Quaternion() * FRotator(0, 0, -90).Quaternion());
 #else
 				currRot = FRotator(currRot.Quaternion() * FRotator(0, 0, -180).Quaternion());
@@ -69,7 +70,7 @@ namespace SpaceMouse::Editor::Interactor
 		case LVT_OrthoNegativeXY:
 			{
 				currRot = FRotationMatrix::MakeFromX({0, 0, 1}).Rotator();
-#if UNREAL_VERSION(<, 5, 6)
+#if UE_VERSION_OLDER_THAN(5, 6, 0)
 				currRot = FRotator(currRot.Quaternion() * FRotator(0, 0, 90).Quaternion());
 #else
 				currRot = FRotator(currRot.Quaternion() * FRotator(0, 0, 180).Quaternion());

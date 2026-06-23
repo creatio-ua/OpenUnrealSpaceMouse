@@ -31,6 +31,7 @@ public class SpaceMouseReader : ModuleRules
             "YamlCpp",
             
             "Mcro",
+            "Hidapi"
         });
         
         PrivateDependencyModuleNames.AddRange(new []

@@ -148,13 +148,13 @@ namespace SpaceMouse::Reader::Hid
 	{
 		auto devInfo = hid_enumerate(0, 0);
 		auto firstDevInfo = devInfo;
-		ASSERT_RETURN(devInfo, FHidError())
-			->WithMessage(TEXT_"Couldn't enumerate HID devices.")
-			->AsFatal()
-			->BreakDebugger()
-			->WithCppStackTrace()
-			->ERROR_LOG(LogSpaceMouseHid, Error)
-		;
+		// ASSERT_RETURN(devInfo, FHidError())
+			// ->WithMessage(TEXT_"Couldn't enumerate HID devices.")
+			// ->AsFatal()
+			// ->BreakDebugger()
+			// ->WithCppStackTrace()
+			// ->ERROR_LOG(LogSpaceMouseHid, Error)
+		// ;
 
 		ON_SCOPE_EXIT { hid_free_enumeration(firstDevInfo); };
 

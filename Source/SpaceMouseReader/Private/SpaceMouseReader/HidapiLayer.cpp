@@ -161,6 +161,18 @@ namespace SpaceMouse::Reader::Hid
 		int order = 0;
 		while (devInfo)
 		{
+			// Look for the hid_device_info struct provided by hidapi
+			if (devInfo->usage_page == 65290 || devInfo->usage_page >= 0xFF00)
+			{
+				// Skip these vendor-defined receiver interfaces entirely
+				continue; 
+			}
+
+			// Or, even better, exclusively accept the Multi-axis Controller:
+			if (devInfo->usage_page != 1 || devInfo->usage != 8)
+			{
+				continue;
+			}
 			function(order, *devInfo);
 			devInfo = devInfo->next;
 			order++;

@@ -165,12 +165,16 @@ namespace SpaceMouse::Reader::Hid
 			if (devInfo->usage_page == 65290 || devInfo->usage_page >= 0xFF00)
 			{
 				// Skip these vendor-defined receiver interfaces entirely
+				devInfo = devInfo->next;
+				order++;
 				continue; 
 			}
 
 			// Or, even better, exclusively accept the Multi-axis Controller:
 			if (devInfo->usage_page != 1 || devInfo->usage != 8)
 			{
+				devInfo = devInfo->next;
+				order++;
 				continue;
 			}
 			function(order, *devInfo);

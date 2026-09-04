@@ -148,19 +148,35 @@ namespace SpaceMouse::Reader::Hid
 	{
 		auto devInfo = hid_enumerate(0, 0);
 		auto firstDevInfo = devInfo;
-		ASSERT_RETURN(devInfo, FHidError())
-			->WithMessage(TEXT_"Couldn't enumerate HID devices.")
-			->AsFatal()
-			->BreakDebugger()
-			->WithCppStackTrace()
-			->ERROR_LOG(LogSpaceMouseHid, Error)
-		;
+		// ASSERT_RETURN(devInfo, FHidError())
+			// ->WithMessage(TEXT_"Couldn't enumerate HID devices.")
+			// ->AsFatal()
+			// ->BreakDebugger()
+			// ->WithCppStackTrace()
+			// ->ERROR_LOG(LogSpaceMouseHid, Error)
+		// ;
 
 		ON_SCOPE_EXIT { hid_free_enumeration(firstDevInfo); };
 
 		int order = 0;
 		while (devInfo)
 		{
+			// Look for the hid_device_info struct provided by hidapi
+			if (devInfo->usage_page == 65290 || devInfo->usage_page >= 0xFF00)
+			{
+				// Skip these vendor-defined receiver interfaces entirely
+				devInfo = devInfo->next;
+				order++;
+				continue; 
+			}
+
+			// Or, even better, exclusively accept the Multi-axis Controller:
+			if (devInfo->usage_page != 1 || devInfo->usage != 8)
+			{
+				devInfo = devInfo->next;
+				order++;
+				continue;
+			}
 			function(order, *devInfo);
 			devInfo = devInfo->next;
 			order++;

@@ -64,7 +64,7 @@ namespace SpaceMouse::Editor::Interactor
 		}
 
 		// TODO: ignore camera movement when the player possesses a Pawn in PIE, but not when ejected or only SIE
-		auto activeVpcCandidate = vpClients
+		auto activeVpcCandidate = AsView(vpClients)
 			| FilterValid()
 			| rv::filter([this](const FEditorViewportClient* cvp)
 			{

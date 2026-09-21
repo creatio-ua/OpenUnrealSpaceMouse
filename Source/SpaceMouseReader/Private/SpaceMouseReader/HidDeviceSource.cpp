@@ -83,8 +83,7 @@ namespace SpaceMouse::Reader
 	ranges::any_view<TWeakPtr<FDeviceModel>> FHidDeviceSource::GetKnownHidDevices()
 	{
 		namespace rv = ranges::views;
-		auto allModels = GetAllKnownDeviceModels();
-		return AsView(allModels)
+		return GetAllKnownDeviceModels()
 			| rv::filter([](TSharedRef<FDeviceModel> const& model) -> bool
 			{
 				return model->TryGet<FCreateHidDevice>() && model->GetId().TryGet<Hid::FHidDeviceId>();
